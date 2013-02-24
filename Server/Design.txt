@@ -1,0 +1,26 @@
+
+
+Design:
+Data Types used:
+Handler: Thread to manage a client. 
+MessageSender: Handles all messages being sent to clients.
+
+
+The main method is called ChatServer. Upon start, it creates a ServerSocket, an ArrayList of type Handler, and a
+MessageSender object. The ServerSocket then listens for connections on port 7777. When a connection is found, 
+a new Handler object is created, with the MessageSender being passed as a parameter, as well as the socket being accepted.
+The thread is then started, and is added to and ArrayList that keeps track of current connections.
+
+Each Handler thread has a socket to their specific client, a BufferedReader to get data from the client, and a 
+PrintWriter to send data back. When a Handler is created, it is given the socket of its client, and a copy of 
+MessageSender. In it's run method, the Handler first reads the nickname from the client and stores it.
+Whenever the Handler receives a message from the client, it puts the message into the MessageSender, and calls the 
+run() method on the MessageSender. Once the Handler leaves the while loop, it tells the MessageSender it has left, then
+closes its PrintWriter, BufferedReader and Socket.
+
+The MessageSender class sends messages to each client. It is not a thread. When a Handler calls getMessage() on the 
+MessageSender, the string is put onto a Queue, along with all other messages that have yet to be sent. The client then
+calls run(), which in turn calls the MessageSender's sendMessages() method. This method takes the first message
+on the Queue, and sends it to each client currently connected, by calling the send() method contained in each Handler.
+If send() fails, then the value true is returned, and the client currently being operated on is removed from the 
+ArrayList.
